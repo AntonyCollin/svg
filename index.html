@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script defer>
+        let mois = [
+            "janvier",
+            "février",
+            "mars",
+            "avril",
+            "mai",
+            "juin",
+            "juillet",
+            "août",
+            "septembre",
+            "octobre",
+            "novembre",
+            "décembre",
+        ];
+        let ventes = [
+            6500, 5550, 4200, 4525, 2500, 1500, 500, 1000, 1750, 2300, 3700, 3500,
+        ];
+
+    </script>
+    <style>
+        div {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="center">Ventes 2022</div>
+    <div id="graphContainer" style="margin:auto;"></div>
+
+    <script defer>
+
+        const svgns = "http://www.w3.org/2000/svg";
+        let viewPortMaxUnitX = 1000;
+        let viewPortMaxUnitY = 1000;
+        let viewport = null;
+        init_UI();
+        function init_UI() {
+            insertViewPort("graphContainer");
+            Graphic(7,20,200,7.5,50,30);
+        }
+        function insertViewPort(containerId) {
+            viewport = document.createElementNS(svgns, "svg");
+            viewport.setAttribute("id", "viewport");
+            viewport.setAttribute("viewBox", "0 0 " + viewPortMaxUnitX + " " + viewPortMaxUnitY);
+            document.getElementById(containerId).appendChild(viewport);
+        }
+        function Graphic(dizaines,y,x,distanceBetweenLines,distanceBetweenText, rectWidth) {
+
+            // lignes et valeurs
+            let currentHeight = y;
+            for (let count = 1; count <= dizaines; count++) {
+
+                for (let i = 0; i < 10; i++) {
+          
+                        viewport.appendChild(line(800, currentHeight + i * distanceBetweenLines, x, currentHeight + i * distanceBetweenLines, 'black', i == 9 && count != 1 || i == 0 && count ==1 ? 2 : 1));
+
+                        if (i == 9)
+                            viewport.appendChild(text(150,currentHeight + distanceBetweenLines * 10,"$ " +(dizaines - count) * 1000));
+                        else if (i == 0 && count ==1 )
+                        {
+                            viewport.appendChild(text(150,currentHeight,"$ " + (dizaines * 1000)));
+
+                        }
+
+                        if (i == 9 && count == 1)
+                        {
+                            viewport.appendChild(line(800, currentHeight + (i + 1) * distanceBetweenLines, x, currentHeight + (i + 1) * distanceBetweenLines, 'black', i == 9 || i == 0 && count ==1 ? 2 : 1));
+                            currentHeight += distanceBetweenLines;
+                        }
+
+                }
+                currentHeight += distanceBetweenLines * 10;
+            }
+
+            // dates                                                         
+            for (let i = 0; i < mois.length; i++) {   
+                viewport.appendChild(text(i * distanceBetweenText + x - 10,(dizaines * 1000 - ventes[i]) / (dizaines * 1000 / (dizaines * 10)) * distanceBetweenLines + y - 10, "$ " + ventes[i], 0));                                                       
+                viewport.appendChild((rect(i * distanceBetweenText + x, (dizaines * 1000 - ventes[i]) / (dizaines * 1000 / (dizaines * 10)) * distanceBetweenLines + y, rectWidth,ventes[i] / (dizaines * 1000 / (dizaines * 10)) * distanceBetweenLines, color(ventes[i]), 5)));
+                viewport.appendChild(text(i * distanceBetweenText + x, currentHeight + 10, mois[i], 45));
+            }
+        }
+
+        function color(value)
+        {
+            if (value >= 0 && value < 1000)
+            {
+                return 'red';
+            }
+
+            if (value >= 1000 && value < 3000)
+            {
+                return 'orange';
+            }
+
+            if (value >= 3000 && value < 4500)
+            {
+                return 'yellow';
+            }
+
+            return 'green';
+            
+        }
+
+        function line(x1, y1, x2, y2, stroke = "black", strokeWidth = 1) {
+            let line = document.createElementNS(svgns, "line");
+            line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+            line.setAttribute("stroke", stroke);
+            line.setAttribute("stroke-width", strokeWidth);
+            return line;
+        }
+        function rect(x, y, width, height, fill = "white", stroke = "black", strokeWidth = 1) {
+            let rect = document.createElementNS(svgns, "rect");
+            rect.setAttribute("x", x); rect.setAttribute("y", y);
+            rect.setAttribute("width", width); rect.setAttribute("height", height);
+            rect.setAttribute("fill", fill); rect.setAttribute("stroke", stroke);
+            rect.setAttribute("stroke-width", strokeWidth);
+            return rect;
+        }
+        function text(x, y, content, angle = 0, size = "1", fill = "black") {
+            let text = document.createElementNS(svgns, "text");
+            text.setAttribute("x", x); text.setAttribute("y", y);
+            text.setAttribute("transform", `rotate(${angle},${x},${y})`);
+            text.setAttribute("font-size", size + "em");
+            text.setAttribute("fill", fill);
+            text.innerHTML = content;
+            return text;
+        }
+    </script>
+
+</body>
+
+</html>
